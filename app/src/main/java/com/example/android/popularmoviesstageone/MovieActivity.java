@@ -2,6 +2,7 @@ package com.example.android.popularmoviesstageone;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.popularmoviesstageone.adapter.MovieArrayAdapter;
@@ -33,12 +35,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
+/**
+ * Main activity to display a grid of movie poster images.
+ */
 public class MovieActivity extends AppCompatActivity implements MovieArrayAdapter.MovieArrayAdapterOnClickHandler {
 
     ArrayList<Movie> movies;
     MovieArrayAdapter movieAdapter;
     String filter;
-    //ListView lvItems;
 
     @BindView(R.id.rvMovies) RecyclerView rvMovies;
     @BindView(R.id.tbToolbar) android.support.v7.widget.Toolbar tbToolbar;
@@ -52,26 +56,18 @@ private Toast mToast;
 
         setContentView(R.layout.activity_movie);
         ButterKnife.bind(this);
-        //RecyclerView rvMovies = (RecyclerView) findViewById(R.id.lvMovies);
 
         // Sets the toolbar to act as the ActionBar for this Activity window.
         if (tbToolbar != null) {
             setSupportActionBar(tbToolbar);
         }
-        //lvItems = (ListView) findViewById(R.id.lvMovies);
         tbToolbar.setTitle(getResources().getString(R.string.app_name));
         initialize();
-        //final Spinner spinner = findViewById(R.id.spSpinner);
-
-        //String url = "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
-        // /movie/popular and /movie/top_rated
-        //String url = "https://api.themoviedb.org/3/movie/popular?api_key=4c155f804dc423055d1497f3441a34fa";
     }
 
     private void initialize() {
         movies = new ArrayList<>();
         movieAdapter = new MovieArrayAdapter(this, movies, this);
-        //lvItems.setAdapter(movieAdapter);
         rvMovies.setAdapter(movieAdapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(
                 this,
@@ -80,21 +76,10 @@ private Toast mToast;
                 false
         );
         rvMovies.setLayoutManager(gridLayoutManager);
-
-                /*
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this,
-                R.layout.item_custom_spinner,
-                getResources().getStringArray(R.array.sort_order_array));
-
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerAdapter);
-        */
-
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(MovieActivity.this, spinner.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
                 int selected = adapterView.getSelectedItemPosition();
                 fetch(selected);
             }
@@ -128,20 +113,20 @@ private Toast mToast;
                 }
 
                 @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString,
-                                      Throwable throwable) {
-                    super.onFailure(statusCode, headers, responseString, throwable);
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
                 }
             });
         } else {
-            // Send a Toast or something helpful
+            Toast.makeText(this, getResources().getString(R.string.network_unavailable),
+                    Toast.LENGTH_SHORT);
         }
     }
 
     /**
      * Check to make sure there is network connection
      * @return True if network is available, false otherwise.
-     * Source:
+     * Credit:
      * https://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-times-out
      */
     public boolean isOnline() {
@@ -151,20 +136,12 @@ private Toast mToast;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.sortby, menu);
-        return true;
-    }
-
-    @Override
     public void onClick(Movie movie) {
-        Toast.makeText(this, movie.getPosterPath(), Toast.LENGTH_LONG).show();
         Class destinationActivity = DetailActivity.class;
         Context context = MovieActivity.this;
         Intent intent = new Intent(context, destinationActivity);
 
-        //intent.putExtra(Intent.EXTRA_TEXT, m.getPosterPath());
-        intent.putExtra("movie", Parcels.wrap(movie));
+        intent.putExtra(Movie.MOVIE_EXTRA, Parcels.wrap(movie));
         startActivity(intent);
     }
 }

@@ -13,6 +13,9 @@ import java.util.ArrayList;
  */
 @Parcel
 public class Movie {
+
+    public static final String MOVIE_EXTRA = "movie";
+
     String posterPath;
     String backdropPath;
     String originalTitle;

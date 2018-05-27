@@ -17,12 +17,11 @@ public class NetworkUtils {
 
     private static String[] filterTypes = new String[]{POPULAR, TOP_RATED};
 
-    private static final String MOVIES_POPULAR_URL =
-            "https://api.themoviedb.org/3/movie/popular?api_key=4c155f804dc423055d1497f3441a34fa";
-
-    private static final String MOVIES_TOP_RATED_URL =
-            "https://api.themoviedb.org/3/movie/top_rated?api_key=4c155f804dc423055d1497f3441a34fa";
-
+    /**
+     * Return the movieDB url for the given filter.
+     * @param apiFilter Integer representing the supported filter types.
+     * @return URL string for the movieDB API.
+     */
     public static String getMoviesUrl(int apiFilter) {
         return API_BASE_URL + getFilterType(apiFilter) + API_KEY_PARAM + getApiKey();
     }
@@ -32,11 +31,15 @@ public class NetworkUtils {
         if (filterPosition < filterTypes.length) {
             filter = filterTypes[filterPosition];
         }
-        Log.d("NetworkUtils", "Filter=" + filter);
+        Log.d(TAG, "Filter=" + filter);
         return filter;
     }
 
+    /**
+     * Returns themoveDB API key.
+     * @return String representing the API key.
+     */
     public static String getApiKey() {
-        return "4c155f804dc423055d1497f3441a34fa";
+        return "";
     }
 }
